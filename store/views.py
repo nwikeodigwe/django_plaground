@@ -1,12 +1,15 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from rest_framework import status
+# from rest_framework.pagination import PageNumberPagination
+# from rest_framework.pagination import LimitOffsetPagination
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet
-from store.filters import ProductFilter
+from .filters import ProductFilter
+from .pagination import DefaultPagination
 # from rest_framework.views import APIView
 # from rest_framework.decorators import api_view
 from .models import Product, Collection, OrderItem, Review
@@ -15,10 +18,14 @@ from .serializers import CollectionSerializer, ProductSerializer, ReviewSerializ
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
     # filterset_fields = ['collection_id', 'unit_price']
+    # pagination_class = PageNumberPagination
+    # pagination_class = LimitOffsetPagination
+    pagination_class = DefaultPagination
     search_fields = ['title', 'description']
+    ordering_fields = ['unit_price', 'last_update']
 
     # def get_queryset(self):
     #     queryset = Product.objects.all()
