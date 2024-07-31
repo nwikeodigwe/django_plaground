@@ -24,5 +24,6 @@ admin.site.index_title = 'Admin'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('playground/', include('playground.urls')),
+    path('store/', include('store.urls')),
     path('admin/index/', admin.site.index, name='admin-index')
 ] + debug_toolbar_urls()
