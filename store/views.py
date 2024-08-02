@@ -4,7 +4,7 @@ from django.db.models import Count
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny 
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny, DjangoModelPermissions
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 # from rest_framework.pagination import PageNumberPagination
@@ -12,7 +12,7 @@ from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyM
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-from store.permissions import IsAdminOrReadOnly
+from store.permissions import IsAdminOrReadOnly, FullDjangoModelPermissions, ViewCustomerHistoryPermission
 
 # from core import serializers
 from .filters import ProductFilter
@@ -92,6 +92,7 @@ class CartItemViewSet(ModelViewSet):
 class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    # permission_classes = [fullDjangoModelPermissions]
     permission_classes = [IsAdminUser]
 
     # def get_permissions(self):
@@ -110,9 +111,11 @@ class CustomerViewSet(ModelViewSet):
             serialize.is_valid(raise_exception=True)
             serialize.save()
             return Response(serialize.data)
-
-
     
+    @action(detail=True, permission_classes=[ViewCustomerHistoryPermission])
+    def history(self, request, pk):
+        return Response('ok')
+
 class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
