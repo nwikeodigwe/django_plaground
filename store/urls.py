@@ -1,7 +1,6 @@
 # from cgitb import lookup
 # from django.urls import path, include
 # from rest_framework.routers import DefaultRouter
-from cgitb import lookup
 from rest_framework_nested import routers
 from . import views
 # from pprint import pprint
@@ -10,6 +9,7 @@ router = routers.DefaultRouter()
 router.register('products', views.ProductViewSet, basename='products')
 router.register('collections', views.CollectionViewSet)
 router.register('carts', views.CartViewSet)
+router.register('customers', views.CustomerViewSet, basename='customers')
 # pprint(router.urls)
 
 product_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
