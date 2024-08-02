@@ -19,8 +19,8 @@ from .filters import ProductFilter
 from .pagination import DefaultPagination
 # from rest_framework.views import APIView
 # from rest_framework.decorators import api_view
-from .models import CartItem, Customer, Product, Collection, OrderItem, Review, Cart
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, CustomerSerializer, ProductSerializer, ReviewSerializer, UpdateCartItemSerializer
+from .models import CartItem, Customer, Order, Product, Collection, OrderItem, Review, Cart
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, CustomerSerializer, OrderSerializer, ProductSerializer, ReviewSerializer, UpdateCartItemSerializer
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -115,6 +115,11 @@ class CustomerViewSet(ModelViewSet):
     @action(detail=True, permission_classes=[ViewCustomerHistoryPermission])
     def history(self, request, pk):
         return Response('ok')
+    
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAdminUser]
 
 class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()
