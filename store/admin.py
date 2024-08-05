@@ -5,7 +5,7 @@ from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils.html import format_html, urlize
 from django.http import HttpRequest
-from . import  models
+from .models import Collection, Customer, Order, OrderItem, Product, ProductImage
 
 class InventoryFilter(admin.SimpleListFilter):
     title = 'inventory'
@@ -21,7 +21,7 @@ class InventoryFilter(admin.SimpleListFilter):
             return queryset.filter(inventory__lt=10)
         return queryset
 
-@admin.register(models.Customer)
+@admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'membership']
     list_editable = ['membership']
@@ -30,14 +30,23 @@ class CustomerAdmin(admin.ModelAdmin):
     list_per_page = 10
     search_fields = ['first_name__istartswith', 'last_name__istartswith']
 
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    readonly_fields = ['thumbnail']
 
-@admin.register(models.Product)
+    def thumbnail(self, instance):
+        if instance.image.name != '':
+            return format_html(f'<img src="{instance.image.url}" class="thumbnail" />')
+        return ''
+
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields = ['collection']
     prepopulated_fields = {
         'slug': ['title']
     }
     actions = ['clear_inventory']
+    inlines = [ProductImageInline]
     list_display = ['title', 'unit_price', 'inventory_status', 'collection_title']
     list_editable = ['unit_price']
     list_filter = ['collection', 'last_update', InventoryFilter]
@@ -61,9 +70,14 @@ class ProductAdmin(admin.ModelAdmin):
     
     def collection_title(self, product):
         return product.collection.title
+    
+    class Media:
+        css = {
+            'all': ['store/styles.css']
+        }
 
 
-@admin.register(models.Collection)
+@admin.register(Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'products_count']
     search_fields = ['title']
@@ -82,10 +96,10 @@ class OrderItemInline(admin.StackedInline):
     autocomplete_fields = ['product']
     min_num = 1
     max_num = 10
-    model = models.OrderItem
+    model = OrderItem
     extra = 0
 
-@admin.register(models.Order)
+@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'placed_at', 'customer']
     inlines = [OrderItemInline]

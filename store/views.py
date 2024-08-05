@@ -1,3 +1,4 @@
+from itertools import product
 from multiprocessing import context
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -20,11 +21,11 @@ from .filters import ProductFilter
 from .pagination import DefaultPagination
 # from rest_framework.views import APIView
 # from rest_framework.decorators import api_view
-from .models import CartItem, Customer, Order, Product, Collection, OrderItem, Review, Cart
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, CreateOrderSerializer, CustomerSerializer, OrderSerializer, ProductSerializer, ReviewSerializer, UpdateCartItemSerializer, UpdateOrderSerializer
+from .models import CartItem, Customer, Order, Product, Collection, OrderItem, ProductImage, Review, Cart
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, CreateOrderSerializer, CustomerSerializer, OrderSerializer, ProductImageSerializer, ProductSerializer, ReviewSerializer, UpdateCartItemSerializer, UpdateOrderSerializer
 
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.prefetch_related('images').all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
@@ -154,7 +155,15 @@ class OrderViewSet(ModelViewSet):
         serializer = OrderSerializer(order)
         return Response(serializer.data)
 
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+    # queryset = ProductImage.objects.all()
 
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
+
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
 
 class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()
