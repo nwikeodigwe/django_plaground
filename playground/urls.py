@@ -4,5 +4,5 @@ from . import views
 
 #This is a URLConf module basically meaning URL configuration
 urlpatterns = [
-    path('hello/', views.say_hello)
+    path('hello/', views.HelloView.as_view())
 ]

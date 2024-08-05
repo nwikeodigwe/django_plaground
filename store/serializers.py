@@ -1,5 +1,6 @@
 from django.db import transaction
 from decimal import Decimal
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from .signals import order_created
 from .models import CartItem, Customer, Order, OrderItem, Product, Collection, ProductImage, Review, Cart
@@ -79,10 +80,12 @@ class CartItemSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True) 
     items = CartItemSerializer(many=True, read_only=True)
-    total_price = serializers.SerializerMethodField()
+    # total_price = serializers.SerializerMethodField()
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     def get_total_price(self, cart):
-        return sum([item.quantity * item.product.unit_price for item in cart.items.all()])
+        # return sum([item.quantity * item.product.unit_price for item in cart.items.all()])
+        return cart.total_price
 
     class Meta:
         model = Cart
@@ -91,9 +94,16 @@ class CartSerializer(serializers.ModelSerializer):
 class AddCartItemSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.products = Product.objects.all().values_list('id', flat=True)
+
     def validate_product_id(self, value):
-        if not Product.objects.filter(pk=value).exists():
+        # if not Product.objects.filter(pk=value).exists():
+        #     raise serializers.ValidationError('No product with the given ID was found.')
+        if value not in self.products:
             raise serializers.ValidationError('No product with the given ID was found.')
+        # get_object_or_404(Product, pk=value)
         return value
 
     def save(self, **kwargs):

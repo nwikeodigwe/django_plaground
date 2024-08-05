@@ -1,8 +1,6 @@
-from itertools import product
-from multiprocessing import context
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count
+from django.db.models import Count, Sum, F
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -26,6 +24,7 @@ from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializ
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.prefetch_related('images').all()
+    # queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
@@ -70,8 +69,10 @@ class CollectionViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 class CartViewSet(CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, GenericViewSet):
-    queryset = Cart.objects.prefetch_related('items__product').all()
+    # queryset = Cart.objects.prefetch_related('items__product').all()
+    queryset = Cart.objects.prefetch_related('items__product').annotate(total_price=Sum(F('items__quantity') * F('items__product__unit_price')))
     serializer_class = CartSerializer  
+    
 
 class CartItemViewSet(ModelViewSet):
     http_method_names =  ['get', 'post', 'patch', 'delete']

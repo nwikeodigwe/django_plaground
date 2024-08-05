@@ -1,1 +1,5 @@
 .venv
+*.pyc
+/media/
+/static/
+*.log

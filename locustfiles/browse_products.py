@@ -1,3 +1,4 @@
+# from json import JSONDecodeError
 from locust import HttpUser, task, between
 from random import randint
 
@@ -14,7 +15,7 @@ class WebsiteUser(HttpUser):
     def view_product(self):
         # print('View roduct details')
         product_id = randint(1, 1000)
-        self.client.get(f'/store/products/{product_id}', name='/store/products/:id')
+        self.client.get(f'/store/products/{product_id}/', name='/store/products/:id')
 
     @task(1)
     def add_to_cart(self):
@@ -26,7 +27,28 @@ class WebsiteUser(HttpUser):
             json={'product_id': product_id, 'quantity': 1}
         )
 
+    @task
+    def say_hello(self):
+        self.client.get('/playground/hello/', name='/playground/hello')
+
+    @task
     def on_start(self):
         response = self.client.post('/store/carts/')
         result = response.json()
         self.cart_id = result['id']
+
+        # Print the response text for debugging
+        # print("Response Text:", response.text)
+
+        # try:
+        #     result = response.json()
+        # except JSONDecodeError as e:
+        #     print(f"Failed to parse JSON response: {e}")
+        #     result = None  # Handle the error as needed
+
+        # if result is not None and 'id' in result:
+        #     self.cart_id = result['id']
+        #     print(f'Cart ID: {self.cart_id}')
+        # else:
+        #     print("Invalid JSON response or 'id' not found in the response")
+        # self.cart_id = result['id']

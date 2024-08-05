@@ -19,6 +19,8 @@ redis = "*"
 celery = "*"
 flower = "*"
 html5lib = "*"
+django-redis = "*"
+gunicorn = "*"
 
 [dev-packages]
 pytest = "*"
@@ -26,6 +28,7 @@ pytest-django = "*"
 pytest-watch = "*"
 model-bakery = "*"
 locust = "*"
+django-silk = "*"
 
 [requires]
 python_version = "3.9"
