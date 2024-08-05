@@ -56,8 +56,8 @@ MIDDLEWARE = [
     
 ]
 
-# if settings.DEBUG:
-#     MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
+if settings.DEBUG:
+    MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
 
 MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
 
@@ -164,19 +164,9 @@ DJOSER = {
     
 }
 
-EMAIL_BACKEND =  'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'localhost'
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_PORT = 2525 
-DEFAULT_EMAIL_ADDR = 'test@test.email'
-
 ADMINS = [
     ('Nwike', 'admin@nwike.com')
 ]
-
-CELERY_BROKER_URL = 'redis://localhost:6379/1'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
 CELERY_BEAT_SCHEDULE = {
     'notify_customers': {
@@ -184,18 +174,6 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 5,
         'args': ['Hello World']
         # 'schedule': crontab(day_of_week=1, hour=7, minute=30)
-    }
-}
-
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/2",
-        "TIMEOUT": timedelta(minutes=10),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
     }
 }
 
