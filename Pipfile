@@ -22,6 +22,7 @@ html5lib = "*"
 django-redis = "*"
 gunicorn = "*"
 dj-database-url = "*"
+django-silk = "*"
 
 [dev-packages]
 pytest = "*"
